@@ -1,6 +1,37 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <v-container>
+      <v-card>
+        <v-card-title>
+          PLAY LIST
+          <v-spacer/>
+          <v-btn @click="getlist">ADD</v-btn>
+        </v-card-title>
+        
+        <v-divider/>
+        
+        <v-card-text>
+          <v-list>
+            <v-list-item v-for="(item, i) in items" :key="i">
+               {{i+1}}. {{ item }}
+              <v-spacer/>
+              <v-btn color="green darken-4" icon @click="play(i)">
+                <v-icon>
+                  mdi-play  
+                </v-icon>
+              </v-btn>
+              <v-btn color="blue-grey darken-4" icon @click="stop(i)">
+                <v-icon>mdi-stop</v-icon>
+              </v-btn>
+              <v-btn  color="red darken-4" icon @click="del(i)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+      </v-card>
+    </v-container>
+
     <v-btn @click="play('play')">
       PLAY
     </v-btn>
@@ -34,18 +65,21 @@ export default {
   name: 'Home',
   data: ()=>({
     file : {},
-    filenames: ''
+    filenames: '',
+    items:[]
   }),
   methods: {
-    play(comm){
-      switch(comm) {        
-        case 'play':
-          this.sendPost({command:'play'})
-          break
-        case 'stop':
-          this.sendPost({command:'stop'})
-          break
-      }      
+    play(id){
+      console.log(id)
+      this.sendPost({command:'play',file:this.items[id]})
+    },
+    stop(id) {
+      console.log(id)
+      this.sendPost({command:'stop',file:this.items[id]})
+    },
+    del(id) {
+      console.log(id)
+      this.items.splice(id,1)
     },
     sendPost(comm) {axios.post('http://127.0.0.1:5000/play',comm
       ).then(res => {
@@ -63,12 +97,23 @@ export default {
             }
           ).then( response => {
             console.log('SUCCESS!!');
-            console.log(response.data)
+            this.listupdate(response.data)
             this.filenames = response.data
           })
           .catch(function () {
             console.log('FAILURE!!');
           });
+    },
+    getlist() {
+      axios.get('http://127.0.0.1:5000/refresh')
+        .then(res => {
+          this.listupdate(res.data)
+        })
+
+    },
+    listupdate(list) {
+      console.log(list)
+      this.items = list
     }
   }
 }
