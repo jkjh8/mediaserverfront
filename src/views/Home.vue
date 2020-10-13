@@ -12,21 +12,26 @@
         
         <v-card-text>
           <v-list>
-            <v-list-item v-for="(item, i) in items" :key="i">
-               {{i+1}}. {{ item }}
-              <v-spacer/>
-              <v-btn color="green darken-4" icon @click="play(i)">
-                <v-icon>
-                  mdi-play  
-                </v-icon>
-              </v-btn>
-              <v-btn color="blue-grey darken-4" icon @click="stop(i)">
-                <v-icon>mdi-stop</v-icon>
-              </v-btn>
-              <v-btn  color="red darken-4" icon @click="del(i)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </v-list-item>
+            <draggable v-model="items">            
+              <v-list-item v-for="(item, i) in items" :key="i">
+                <v-list-item-avatar color="teal darken-4" style="color:white" size="30px">
+                  <span>{{i+1}}</span>
+                </v-list-item-avatar>
+                {{ item }}
+                <v-spacer/>
+                <v-btn color="green darken-4" icon @click="play(i)">
+                  <v-icon>
+                    mdi-play  
+                  </v-icon>
+                </v-btn>
+                <v-btn color="blue-grey darken-4" icon @click="stop(i)">
+                  <v-icon>mdi-stop</v-icon>
+                </v-btn>
+                <v-btn  color="red darken-4" icon @click="del(i)">
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </v-list-item>
+            </draggable>
           </v-list>
         </v-card-text>
       </v-card>
@@ -59,10 +64,13 @@
 <script>
 // @ is an alias to /src
 import axios from 'axios'
+import draggable from 'vuedraggable'
 
 export default {
-
   name: 'Home',
+  components: {
+            draggable,
+        },
   data: ()=>({
     file : {},
     filenames: '',
