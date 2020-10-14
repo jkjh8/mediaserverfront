@@ -19,12 +19,12 @@
                 </v-list-item-avatar>
                 {{ item }}
                 <v-spacer/>
-                <v-btn color="green darken-4" icon @click="player('play',i)">
+                <v-btn color="green darken-4" icon @click="player('list','play',i)">
                   <v-icon>
                     mdi-play  
                   </v-icon>
                 </v-btn>
-                <v-btn color="blue-grey darken-4" icon @click="player('stop',i)">
+                <v-btn color="blue-grey darken-4" icon @click="player('list','stop',i)">
                   <v-icon>mdi-stop</v-icon>
                 </v-btn>
                 <v-btn  color="red darken-4" icon @click="del(i)">
@@ -37,10 +37,10 @@
       </v-card>
     </v-container>
 
-    <v-dialog v-model="dialog" width='600px' persistent>
+    <v-dialog v-model="dialog" max-width="800px" persistent scrollable>
       <v-card>
         <v-card-title>
-          dialog
+          <h3>ADD FILES</h3>
         </v-card-title>
         <v-card-text>
           <v-list-item-group v-model="checkList" multiple active-class="">
@@ -51,10 +51,10 @@
                 </v-list-item-action>
                 {{ item }}
                 <v-spacer/>
-                <v-btn color="green darken-4" icon @click="player('play',i)">
+                <v-btn color="green darken-4" icon @click="player('file','play',i)">
                   <v-icon>mdi-play</v-icon>
                 </v-btn>
-                <v-btn color="blue-grey darken-4" icon @click="player('stop',i)">
+                <v-btn color="blue-grey darken-4" icon @click="player('file','stop',i)">
                   <v-icon>mdi-stop</v-icon>
                 </v-btn>
               </template>
@@ -124,16 +124,23 @@ export default {
   //   }
   // },
   methods: {
-    player(func, id){
-      let command = {
-        command:func,
-        file:this.playList[id]
-      }
+    player(local, func, id){
+      let command
+      if (local === "list") {
+        command = {
+          command:func,
+          file:this.playList[id]
+        } 
+      } else {
+        command = {
+          command:func,
+          file:this.fileList[id]
+        }
+      }      
       this.$store.dispatch('playerFN', command)
     },
     del(id) {
-      console.log(id)
-      this.playList.splice(id,1)
+      this.$store.commit('delPlayList', id)
     },
     ramdomColor() {
       return('#'+ Math.random().toString(16).slice(2,8))
@@ -153,6 +160,7 @@ export default {
         this.$store.commit('addPlayList', this.fileList[element])
         // this.$store.dispatch('addPlayList', this.fileList[element])
       })
+      this.checkList = []
       this.dialog=false
     },
     cancelPlayListAddFile() {

@@ -21,6 +21,9 @@ export default new Vuex.Store({
     },
     addPlayList: ( state, payload ) => {
       state.playList.push(payload)
+    },
+    delPlayList: ( state, payload ) => {
+      state.playList.splice(payload,1)
     }
   },
   actions: {
