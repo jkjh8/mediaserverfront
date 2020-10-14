@@ -81,7 +81,7 @@
 import http from '../api/http'
 import { mapState } from 'vuex'
 import draggable from 'vuedraggable'
-let getplayliststate = true
+// let getplayliststate = true
 
 export default {
   name: 'Home',
@@ -89,32 +89,40 @@ export default {
     draggable,
   },
   data: ()=>({
-    playList:[],
+    // playList:[],
     dialog:false,
     checkList:[]
   }),
   computed: {
-    ...mapState(['fileList'])
+    ...mapState(['fileList','playList']),
+    playList: {
+      get() {
+        return this.$store.state.playList
+      },
+      set(value) {
+        this.$store.commit('updateList', value)
+        http.post('/setPlayList', {playList:value})
+      }
+    }
   },
   created() {
     this.$store.dispatch('getFileList')
     this.getPlayList()
   },
-  watch: {
-    playList: (changelist) => {
-      let newplaylist = {
-        playList: changelist
-      }
-      if (getplayliststate === true) {
-        getplayliststate = false        
-      } else {
-        http.post('/setPlayList', newplaylist).then(res =>{
-          console.log(res.data)
-        })
-      }
-      
-    }
-  },
+  // watch: {
+  //   playList: (changelist) => {
+  //     let newplaylist = {
+  //       playList: changelist
+  //     }
+  //     if (getplayliststate === true) {
+  //       getplayliststate = false        
+  //     } else {
+  //       http.post('/setPlayList', newplaylist).then(res =>{
+  //         console.log(res.data)
+  //       })
+  //     }
+  //   }
+  // },
   methods: {
     player(func, id){
       let command = {
@@ -135,14 +143,15 @@ export default {
       this.dialog = true
     },
     getPlayList() {
-      getplayliststate = true
+      // getplayliststate = true
       http.get('/getPlayList').then(res => {
-        this.playList = res.data
+        this.$store.commit('updateList', res.data)
       })
     },
     playListAddFile() {
       this.checkList.forEach((element) => {
-        this.playList.push(this.fileList[element])
+        this.$store.commit('addPlayList', this.fileList[element])
+        // this.$store.dispatch('addPlayList', this.fileList[element])
       })
       this.dialog=false
     },
